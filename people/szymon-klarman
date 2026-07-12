@@ -1,0 +1,19 @@
+{
+  "@context": "context.jsonld",
+  "@id": "/people/szymon-klarman",
+  "@type": "schema:Person",
+  "rdfs:label": "Szymon Klarman",
+  "dc:description": "Knowledge architect living in Warsaw and working at S&P Global.",
+  "schema:birthDate": "1981-09-18",
+  "schema:homeLocation": {
+    "@id": "/places/warsaw"
+  },
+  "schema:jobTitle": "Knowledge Architect",
+  "schema:worksFor": {
+    "@id": "/companies/sp-global"
+  },
+  "rdfs:comment": {
+    "@value": "Szymon Klarman is a knowledge architect based in Warsaw, Poland, and works at S&P Global, a multinational financial information and analytics company.",
+    "@language": "en"
+  }
+}

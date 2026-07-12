@@ -1,0 +1,14 @@
+{
+  "@context": "context.jsonld",
+  "@id": "/companies/sp-global",
+  "@type": "schema:Organization",
+  "rdfs:label": "S&P Global",
+  "dc:description": "S&P Global is a multinational financial information and analytics company known for credit ratings, benchmarks, market intelligence, and data services.",
+  "okf:boundResource": {
+    "@id": "https://www.spglobal.com"
+  },
+  "rdfs:comment": {
+    "@value": "The company provides data, research, and analytics used by financial institutions, corporations, and public sector organizations around the world.",
+    "@language": "en"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "@context": "context.jsonld",
+  "@id": "/places/warsaw",
+  "@type": "schema:City",
+  "rdfs:label": "Warsaw",
+  "dc:description": "The capital and largest city of Poland, located in the central part of the country.",
+  "rdfs:comment": {
+    "@value": "Warsaw is a major European city known for its history, cultural institutions, and role as Poland's political and economic center.",
+    "@language": "en"
+  }
+}

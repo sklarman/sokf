@@ -1,0 +1,17 @@
+{
+  "@context": "context.jsonld",
+  "@id": "/index",
+  "@type": "rdfs:ResourceCatalog",
+  "dc:title": "Root Knowledge Directory",
+  "rdfs:seeAlso": [
+    {
+      "@id": "/people/szymon-klarman"
+    },
+    {
+      "@id": "/places/warsaw"
+    },
+    {
+      "@id": "/companies/sp-global"
+    }
+  ]
+}

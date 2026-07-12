@@ -1,0 +1,47 @@
+{
+  "@context": "context.jsonld",
+  "@graph": [
+    {
+      "@id": "/log",
+      "@type": "prov:Bundle",
+      "rdfs:label": "Knowledge Revision Log"
+    },
+    {
+      "@id": "/activities/initial-bundle",
+      "@type": "prov:Activity",
+      "prov:startedAtTime": "2026-07-12T00:00:00Z",
+      "prov:endedAtTime": "2026-07-12T00:00:00Z",
+      "dc:description": "Created the initial S-OKF bundle and enriched it with details about Szymon Klarman, Warsaw, and S&P Global.",
+      "prov:wasAssociatedWith": {
+        "@id": "/agents/szymon-klarman"
+      }
+    },
+    {
+      "@id": "/people/szymon-klarman",
+      "@type": "prov:Entity",
+      "prov:wasGeneratedBy": {
+        "@id": "/activities/initial-bundle"
+      }
+    },
+    {
+      "@id": "/places/warsaw",
+      "@type": "prov:Entity",
+      "prov:wasGeneratedBy": {
+        "@id": "/activities/initial-bundle"
+      }
+    },
+    {
+      "@id": "/companies/sp-global",
+      "@type": "prov:Entity",
+      "prov:wasGeneratedBy": {
+        "@id": "/activities/initial-bundle"
+      }
+    },
+    {
+      "@id": "/agents/szymon-klarman",
+      "@type": "prov:Agent",
+      "prov:type": "prov:Person",
+      "rdfs:label": "Szymon Klarman"
+    }
+  ]
+}
