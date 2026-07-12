@@ -1,9 +1,9 @@
 # Semantic Open Knowledge Format (S-OKF)
 ## Version 0.1-JSONLD — Specification Draft
-The **Semantic Open Knowledge Format (S-OKF)** is a graph-native evolution of the Open Knowledge Format. Instead of using a loose collection of Markdown files with frontmatter, S-OKF structures knowledge as interconnected data nodes using standard W3C Semantic Web technologies.
+The **Semantic Open Knowledge Format (S-OKF)** is a graph-native evolution of the Open Knowledge Format. Instead of using a loose collection of Markdown files with frontmatter, S-OKF structures knowledge as JSON-LD documents organized into a discoverable bundle.
 Every bundle in S-OKF forms an explicit, queryable RDF Graph using the JSON-LD serialization format.
 ## 1. Bundle Directory Structure
-An S-OKF Knowledge Bundle is a directory tree of extensionless files containing JSON-LD data. The directory structures match the logical concepts, but the files omit extensions to align perfectly with relative URIs.
+An S-OKF Knowledge Bundle is a directory tree of extensionless files containing JSON-LD data. The directory structures match the logical concepts, but the files omit extensions to align perfectly with POSIX-style paths.
 ```text
 path/to/bundle/
 ├── index          # REQUIRED. Root catalog linking all concepts.
@@ -15,19 +15,20 @@ path/to/bundle/
 
 ```
 ## 2. Core Vocabularies & Context
-By default, S-OKF documents assume the presence of a global @context defining widely recognized vocabularies. The foundational namespaces mapped are:
+S-OKF repositories MUST include a central context file at the repository root named `context.jsonld`. This central context is the canonical JSON-LD context that SHOULD be referenced (by relative path) from all concept JSON-LD objects, index files, and the log file. Using a single shared context ensures consistent prefix expansion and stable interpretation across the bundle.
+
+The canonical context maps the foundational namespaces used throughout S-OKF (for example `rdf`, `rdfs`, `dc`, `prov`, and `okf`). The repository root file `context.jsonld` contains these mappings; concept files should reference it using a relative context reference, e.g.:
 ```json
 {
-  "@context": {
-    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-    "dc": "http://purl.org/dc/terms/",
-    "prov": "http://www.w3.org/ns/prov#",
-    "okf": "https://w3id.org/okf/core#"
-  }
+  "@context": "context.jsonld",
+  "@id": "/tables/orders",
+  "@type": "okf:BigQueryTable",
+  "rdfs:label": "Customer Orders"
 }
-
 ```
+
+(See `context.jsonld` in the repository root for the canonical namespace bindings.)
+
 ## 3. Concept Files
 Every concept document is an individual JSON-LD node. File naming maps directly to the node's subject URI (@id).
 ### Structural Mapping Rules
@@ -40,15 +41,10 @@ Every concept document is an individual JSON-LD node. File naming maps directly 
    * timestamp \rightarrow dc:modified
  * **Markdown Body Integration:** The structural or free-form Markdown body of the concept is embedded as a language-tagged string inside the rdfs:comment property.
 ### Concept Example (/tables/orders)
-Here is how a standard asset description is modeled as an S-OKF Concept:
+Here is how a standard asset description is modeled as an S-OKF Concept (note the shared context reference):
 ```json
 {
-  "@context": {
-    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-    "dc": "http://purl.org/dc/terms/",
-    "okf": "https://w3id.org/okf/core#"
-  },
+  "@context": "context.jsonld",
   "@id": "/tables/orders",
   "@type": "okf:BigQueryTable",
   "rdfs:label": "Customer Orders",
@@ -58,21 +54,18 @@ Here is how a standard asset description is modeled as an S-OKF Concept:
   },
   "dc:modified": "2026-05-28T14:30:00Z",
   "rdfs:comment": {
-    "@value": "# Schema\n| Column | Type | Description |\n|---|---|---|\n| `order_id` | STRING | Unique order identifier. |\n| `customer_id` | STRING | Foreign key linking to [/tables/customers]. |\n\n# Joins\nJoined with [/tables/customers] on `customer_id`.",
+    "@value": "# Schema\n| Column | Type | Description |\n|---|---|---|\n| `order_id` | STRING | Unique order identifier. |\n| `customer_id` | STRING | Foreign key linking to [/tables/customers]. [...]",
     "@language": "en"
   }
 }
 
 ```
 ## 4. Index Files
-The index file serves as the manifest and explicit map for progressive disclosure. It functions as a collection node linking to child or sibling entity URIs using the rdfs:seeAlso property.
+The index file serves as the manifest and explicit map for progressive disclosure. It functions as a collection node linking to child or sibling entity URIs. Index files SHOULD reference the central `context.jsonld` rather than embedding ad-hoc contexts.
 ### Index Example (/index)
 ```json
 {
-  "@context": {
-    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-    "dc": "http://purl.org/dc/terms/"
-  },
+  "@context": "context.jsonld",
   "@id": "/index",
   "@type": "rdfs:ResourceCatalog",
   "dc:title": "Root Knowledge Directory",
@@ -86,18 +79,14 @@ The index file serves as the manifest and explicit map for progressive disclosur
 
 ```
 ## 5. Log Files
-The change log shifts from basic text formatting to an auditable lineage graph using the **W3C PROV-O (Provenance Ontology)** specification. Each modification entry tracking the bundle is defined using foundational PROV entities, activities, and agents.
+The change log shifts from basic text formatting to an auditable lineage graph using the **W3C PROV-O (Provenance Ontology)** specification. Each modification entry tracking the bundle is defined as a prov:Activity. Log files SHOULD reference the central `context.jsonld`.
  * **File Changes:** Modifying or creating a concept represents a prov:Activity.
  * **The Concepts:** Concepts act as prov:Entity states that are prov:wasGeneratedBy or prov:wasInvalidatedBy activities.
  * **The Authors:** People or automated workflows executing the changes are defined as a prov:Agent.
 ### Log Example (/log)
 ```json
 {
-  "@context": {
-    "prov": "http://www.w3.org/ns/prov#",
-    "dc": "http://purl.org/dc/terms/",
-    "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
-  },
+  "@context": "context.jsonld",
   "@graph": [
     {
       "@id": "/log",
@@ -128,9 +117,18 @@ The change log shifts from basic text formatting to an auditable lineage graph u
 
 ```
 ## 6. Graph Relationships & Cross-Linking
-Because S-OKF files are native JSON-LD, standard Markdown cross-links within prose (rdfs:comment) are fully compatible with graph parsing. Furthermore, relationships can be explicitly defined inside the JSON structure using absolute or bundle-relative paths:
-```json
-"rdfs:seeAlso": { "@id": "/tables/customers" }
+Because S-OKF files are native JSON-LD, standard Markdown cross-links within prose (`rdfs:comment`) are fully compatible with graph parsing. More importantly, relationships between concepts in S-OKF SHOULD be modeled using ordinary RDF object properties — not restricted to `rdfs:seeAlso` alone.
 
+Any predicate that is appropriate for the domain may be used to link nodes. For example, you can use domain-specific predicates such as `okf:dependsOn`, `okf:derivedFrom`, `schema:author`, or even a simple `likes` property. The following is a minimal, valid JSON-LD example showing a relationship expressed with a custom property:
+```json
+{
+  "@context": "context.jsonld",
+  "@id": "john",
+  "likes": { "@id": "mary" }
+}
 ```
-This lets consumption agents easily parse and ingest the repository natively as a global graph structure using standard graph engines without writing custom regex parser utilities.
+
+Using explicit object properties (instead of only seeAlso) enables richer semantics, easier SPARQL queries, and clearer intent for automated consumption.
+
+This approach lets consumption agents easily parse and ingest the repository natively as a global graph structure using standard graph engines without writing custom regex parser utilities.
+
